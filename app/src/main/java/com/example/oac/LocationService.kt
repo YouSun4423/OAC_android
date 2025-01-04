@@ -27,121 +27,115 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 class LocationService : Service() {
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var locationCallback: LocationCallback
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(300000, TimeUnit.MILLISECONDS)
+        .readTimeout(100000, TimeUnit.MILLISECONDS)
+        .build()
 
     override fun onCreate() {
         super.onCreate()
+
+        // 通知を作成して startForeground をすぐに呼び出す
+        val notification = createNotification()
+        startForeground(1, notification)
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        startForegroundService()  // フォアグラウンドサービスとして開始
-        startLocationUpdates()    // 位置情報の更新を開始
+        startLocationUpdates()
+    }
+
+    private fun createNotification(): Notification {
+        val notificationChannelId = "LOCATION_SERVICE_CHANNEL"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                notificationChannelId,
+                "Location Service",
+                NotificationManager.IMPORTANCE_LOW
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+
+        val notificationBuilder = NotificationCompat.Builder(this, notificationChannelId)
+            .setContentTitle("位置情報を取得中")
+            .setContentText("バックグラウンドで位置情報を取得しています")
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+
+        return notificationBuilder.build()
     }
 
     private fun startLocationUpdates() {
         val locationRequest = LocationRequest.create().apply {
-            interval = 10000 // 10秒
-            fastestInterval = 5000 // 最短間隔（5秒）
+            interval = 10000 // 10秒ごとに位置情報を取得
+            fastestInterval = 5000
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
 
-        locationCallback = object : LocationCallback() {
+        val locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 for (location in locationResult.locations) {
-                    // 位置情報をログに出力
-                    Log.d("LocationService", "Lat: ${location.latitude}, Lon: ${location.longitude}")
+                    val latitude = location.latitude
+                    val longitude = location.longitude
+                    val currentDateTime = getFormattedCurrentDateTime()
 
-                    // 必要に応じてサーバーへ送信
-                    postLocation(location)
+                    // ブロードキャストで位置情報を送信
+                    val intent = Intent("com.example.oac.LOCATION_UPDATE")
+                    intent.putExtra("latitude", latitude)
+                    intent.putExtra("longitude", longitude)
+                    sendBroadcast(intent)
+
+                    postLocation(latitude, longitude, currentDateTime) { result ->
+                        Log.d("LocationStatus", result)
+                    }
                 }
             }
         }
 
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+            PackageManager.PERMISSION_GRANTED
         ) {
-            return
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
         }
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
     }
 
-    private fun postLocation(location: Location) {
-        val latitude = location.latitude.toString()
-        val longitude = location.longitude.toString()
-        val timestamp = System.currentTimeMillis().toString()
-        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID) // Device IDを取得
-
-        // クエリパラメータをURLに追加
+    private fun postLocation(lat: Double, lon: Double, currentDateTime: String, endProcess: (String) -> Unit) {
+        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         val url = "http://arta.exp.mnb.ees.saitama-u.ac.jp/oac/common/post_location.php?" +
-                "dev=$deviceId&lat=$latitude&lon=$longitude&ts=$timestamp"
+                "dev=$deviceId&lat=$lat&lon=$lon&ts=$currentDateTime"
 
-        // OkHttpクライアントの設定
-        val client = OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .build()
-
-        // リクエストを作成
         val request = Request.Builder()
             .url(url)
             .header("Connection", "close")
             .get()
             .build()
 
-        // 非同期リクエストを実行
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                Log.e("LocationService", "Failed to send location: ${e.message}")
+                endProcess("位置情報送信失敗")
             }
 
             override fun onResponse(call: Call, response: Response) {
-                try {
-                    val responseBody = response.body?.string().orEmpty()
-                    Log.d("LocationService", "Server Response: $responseBody")
-                    if (response.isSuccessful) {
-                        Log.d("LocationService", "Location sent successfully")
-                    } else {
-                        Log.e("LocationService", "Failed to send location: HTTP ${response.code}")
-                    }
-                } catch (e: Exception) {
-                    Log.e("LocationService", "Error processing response: ${e.message}")
+                if (response.isSuccessful) {
+                    endProcess("位置情報送信成功")
+                } else {
+                    endProcess("位置情報送信失敗")
                 }
             }
         })
     }
 
-    private fun startForegroundService() {
-        // 通知チャネルを作成
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                "location_channel",  // チャネルID
-                "Location Service",   // チャネル名
-                NotificationManager.IMPORTANCE_LOW  // 通知の重要度
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
-        }
-
-        // 通知の設定
-        val notification = NotificationCompat.Builder(this, "location_channel")
-            .setContentTitle("Location Service")
-            .setContentText("Running in the background to track location.")
-            .build()
-
-        // サービスをフォアグラウンドで開始
-        startForeground(1, notification)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        fusedLocationClient.removeLocationUpdates(locationCallback)
+    private fun getFormattedCurrentDateTime(): String {
+        val currentDate = Date()
+        val dateFormat = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
+        return dateFormat.format(currentDate)
     }
 
     override fun onBind(intent: Intent?): IBinder? {

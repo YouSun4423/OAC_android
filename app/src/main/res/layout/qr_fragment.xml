@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- 固有番号 -->
+        <EditText
+            android:id="@+id/editTextOacNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="QRコードの固有番号"
+            android:inputType="number" />
+
+        <!-- 電話番号 -->
+        <EditText
+            android:id="@+id/editTextPhoneNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="電話番号を入力"
+            android:inputType="phone" />
+
+        <!-- メールアドレス -->
+        <EditText
+            android:id="@+id/editTextMailAddress"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="メールアドレスを入力"
+            android:inputType="textEmailAddress" />
+
+        <!-- 結果表示 -->
+        <TextView
+            android:id="@+id/textViewResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="固有番号: 未設定"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="16dp" />
+
+        <!-- スキャンボタン -->
+        <Button
+            android:id="@+id/buttonScan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="QRコードをスキャン" />
+
+        <!-- 送信ボタン -->
+        <Button
+            android:id="@+id/buttonSend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="送信"
+            android:layout_marginTop="16dp" />
+
+    </LinearLayout>
+</ScrollView>
