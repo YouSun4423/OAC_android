@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+        <!-- スクロール可能なビューを配置 -->
+        <android.widget.ScrollView
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+                <!-- 内部のLinearLayoutにフォームを配置 -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                        <!-- 詳細情報タイトル -->
+                        <TextView
+                            android:id="@+id/detailTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="詳細情報"
+                            android:textSize="18sp"
+                            android:textColor="@android:color/black"
+                            android:layout_marginBottom="16dp" />
+
+                        <!-- 端末ID -->
+                        <TextView
+                            android:id="@+id/deviceId"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="端末ID: ExampleID"
+                            android:textColor="@android:color/darker_gray"
+                            android:layout_marginBottom="8dp" />
+
+                        <!-- 固有番号 -->
+                        <TextView
+                            android:id="@+id/OACNumber"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="固有番号: 12345"
+                            android:textColor="@android:color/darker_gray"
+                            android:layout_marginBottom="8dp" />
+
+                        <!-- QRコードスキャンボタン -->
+                        <Button
+                            android:id="@+id/scanQRCodeButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="QRコードをスキャン"
+                            android:layout_marginTop="16dp" />
+
+                        <!-- 電話番号入力 -->
+                        <EditText
+                            android:id="@+id/phoneNumberInput"
+                            android:layout_height="wrap_content"
+                            android:hint="電話番号を入力"
+                            android:inputType="phone"
+                            android:padding="12dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_width="match_parent" />
+
+                        <!-- メールアドレス入力 -->
+                        <EditText
+                            android:id="@+id/mailAddressInput"
+                            android:layout_height="wrap_content"
+                            android:hint="メールアドレスを入力"
+                            android:inputType="textEmailAddress"
+                            android:padding="12dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_width="match_parent" />
+
+                        <!-- エラーメッセージ -->
+                        <TextView
+                            android:id="@+id/errorMessage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="エラーメッセージ"
+                            android:textColor="@android:color/holo_red_dark"
+                            android:visibility="gone"
+                            android:layout_marginTop="8dp" />
+
+                        <!-- 送信ボタン -->
+                        <Button
+                            android:id="@+id/sendButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="送信"
+                            android:enabled="false"
+                            android:layout_marginTop="16dp" />
+                </LinearLayout>
+        </android.widget.ScrollView>
+
+        <!-- マップビュー -->
+        <org.osmdroid.views.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
