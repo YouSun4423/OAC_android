@@ -1,12 +1,12 @@
-package com.example.oac
+package jp.su.mnb.oac
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.oac.Fragment.MapFragment
-import com.example.oac.Fragment.QrFragment
-import com.example.oac.Fragment.TrackingFragment
-import com.google.android.gms.location.*
+import jp.su.mnb.oac.Fragment.MapFragment
+import jp.su.mnb.oac.Fragment.QrFragment
+import jp.su.mnb.oac.R
+import jp.su.mnb.oac.Fragment.TrackingFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 

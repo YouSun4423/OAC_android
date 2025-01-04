@@ -1,9 +1,8 @@
-package com.example.oac.Fragment
+package jp.su.mnb.oac.Fragment
 
 import androidx.fragment.app.Fragment
-import com.example.oac.R
+import jp.su.mnb.oac.R
 
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.webkit.WebView

@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.oac.Fragment.MapFragment">
+    tools:context="com.example.oac.jp.example.oac.Fragment.MapFragment">
 
     <!-- 地図表示用の MapView -->
     <org.osmdroid.views.MapView

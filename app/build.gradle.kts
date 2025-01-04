@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.oac"
+    namespace = "jp.su.mnb.oac"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.oac"
+        applicationId = "jp.su.mnb.oac"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

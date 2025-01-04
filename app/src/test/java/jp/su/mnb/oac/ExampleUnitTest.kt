@@ -1,4 +1,4 @@
-package com.example.oac
+package jp.su.mnb.oac
 
 import org.junit.Test
 
