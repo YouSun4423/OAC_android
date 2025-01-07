@@ -118,7 +118,7 @@ class MapFragment : Fragment() {
         requireContext().registerReceiver(
             locationReceiver,
             IntentFilter("com.example.oac.LOCATION_UPDATE"),
-            Context.RECEIVER_NOT_EXPORTED
+            Context.RECEIVER_EXPORTED
         )
     }
 
